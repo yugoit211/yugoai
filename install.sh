@@ -246,21 +246,63 @@ rebrand_engine() {
         return 0
     fi
 
-    info "Rebranding engine banner..."
+    info "Rebranding engine..."
 
-    # "Hermes Agent v" -> "YUGOAI Agent v" in version label (inside f-string)
+    # "Hermes Agent v" -> "YUGOAI Agent v" in version label
     if grep -q 'Hermes Agent v' "$banner_py" 2>/dev/null; then
         sed -i '' 's/Hermes Agent v/YUGOAI Agent v/g' "$banner_py" 2>/dev/null || \
         sed -i 's/Hermes Agent v/YUGOAI Agent v/g' "$banner_py" 2>/dev/null
     fi
 
-    # "Nous Research" -> "Yugo-Labs-AI" in provider label (inside f-string)
+    # "Nous Research" -> "Yugo-Labs-AI" in provider label
     if grep -q 'Nous Research' "$banner_py" 2>/dev/null; then
         sed -i '' 's/Nous Research/Yugo-Labs-AI/g' "$banner_py" 2>/dev/null || \
         sed -i 's/Nous Research/Yugo-Labs-AI/g' "$banner_py" 2>/dev/null
     fi
 
-    ok "Engine banner rebranded"
+    # Patch default_soul.py: "Hermes Agent" -> "YUGOAI Agent"
+    local soul_py
+    soul_py=$(python3 -c "import hermes_cli.default_soul; print(hermes_cli.default_soul.__file__)" 2>/dev/null) || true
+    if [ -n "$soul_py" ] && [ -f "$soul_py" ] && grep -q 'Hermes Agent' "$soul_py" 2>/dev/null; then
+        sed -i '' 's/Hermes Agent/YUGOAI Agent/g' "$soul_py" 2>/dev/null || \
+        sed -i 's/Hermes Agent/YUGOAI Agent/g' "$soul_py" 2>/dev/null
+    fi
+
+    ok "Engine rebranded"
+}
+
+# ─── Write YUGOAI SOUL.md ────────────────────────────────────
+write_soul() {
+    local soul_file="$HOME/.hermes/profiles/yugoai/SOUL.md"
+    info "Writing YUGOAI personality..."
+
+    cat > "$soul_file" << 'SOULEOF'
+# YUGOAI Agent Persona
+
+You are YUGOAI Agent, an intelligent AI assistant created by Yugo-Labs-AI. You are helpful, knowledgeable, and direct. You assist users with a wide range of tasks including answering questions, writing and editing code, analyzing information, creative work, and executing actions via your tools. You communicate clearly, admit uncertainty when appropriate, and prioritize being genuinely useful over being verbose unless otherwise directed below. Be targeted and efficient in your exploration and investigations.
+
+If the user asks about configuring, setting up, or using YUGOAI Agent itself, load the hermes-agent skill with skill_view(name='hermes-agent') before answering.
+SOULEOF
+
+    ok "YUGOAI personality written"
+}
+
+# ─── Patch profile config ────────────────────────────────────
+patch_profile_config() {
+    local config="$HOME/.hermes/profiles/yugoai/config.yaml"
+    info "Patching profile config..."
+
+    # Replace any remaining "Hermes" references
+    if grep -q 'Captain Hermes' "$config" 2>/dev/null; then
+        sed -i '' 's/Captain Hermes/Captain YUGOAI/g' "$config" 2>/dev/null || \
+        sed -i 's/Captain Hermes/Captain YUGOAI/g' "$config" 2>/dev/null
+    fi
+    if grep -q 'call me Hermes' "$config" 2>/dev/null; then
+        sed -i '' 's/call me Hermes/call me YUGOAI/g' "$config" 2>/dev/null || \
+        sed -i 's/call me Hermes/call me YUGOAI/g' "$config" 2>/dev/null
+    fi
+
+    ok "Profile config patched"
 }
 
 # ─── Main ───────────────────────────────────────────────────
@@ -284,6 +326,10 @@ main() {
     install_skin
     echo ""
     rebrand_engine
+    echo ""
+    write_soul
+    echo ""
+    patch_profile_config
     echo ""
 
     echo -e "${GREEN}${BOLD}   ⚡ Installation complete!${NC}"
