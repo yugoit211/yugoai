@@ -225,9 +225,11 @@ banner_logo: |
   [#00BFFF]      ╚═╝  ╚═╝╚═╝[/]
 
 banner_hero: |
-  [#1E90FF]╔╦╗╦ ╦╔═╗╔═╗╦  ╔═╗╔╗ ╔═╗ ─ ╔═╗╦[/]
-  [#00BFFF] ║ ║ ║║ ╦║ ║║  ╠═╣╠╩╗╚═╗ ─ ╠═╣║[/]
-  [#00688B] ╩ ╚═╝╚═╝╚═╝╩═╝╩ ╩╚═╝╚═╝ ─ ╩ ╩║[/]
+  [#00BFFF]▐▛███▜▌[/]
+  [#00BFFF]▐▌[/]
+  [#00BFFF]▐▌   Y U G O L A B S - A I   [/]
+  [#00BFFF]▐▌[/]
+  [#00688B]▐▙███▟▌[/]
 SKINEOF
         hermes -p yugoai config set display.skin yugoai 2>/dev/null || true
         ok "YUGOAI skin installed (built-in)"
