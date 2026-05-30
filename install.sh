@@ -223,6 +223,33 @@ SKINEOF
     fi
 }
 
+# ─── Rebrand engine banner ──────────────────────────────────
+rebrand_engine() {
+    local banner_py
+    banner_py=$(python3 -c "import hermes_cli.banner; print(hermes_cli.banner.__file__)" 2>/dev/null) || true
+
+    if [ -z "$banner_py" ] || [ ! -f "$banner_py" ]; then
+        warn "Could not find banner.py, skipping engine rebrand"
+        return 0
+    fi
+
+    info "Rebranding engine banner..."
+
+    # "Hermes Agent v" -> "YUGOAI Agent v" in version label (inside f-string)
+    if grep -q 'Hermes Agent v' "$banner_py" 2>/dev/null; then
+        sed -i '' 's/Hermes Agent v/YUGOAI Agent v/g' "$banner_py" 2>/dev/null || \
+        sed -i 's/Hermes Agent v/YUGOAI Agent v/g' "$banner_py" 2>/dev/null
+    fi
+
+    # "Nous Research" -> "Yugo-Labs-AI" in provider label (inside f-string)
+    if grep -q 'Nous Research' "$banner_py" 2>/dev/null; then
+        sed -i '' 's/Nous Research/Yugo-Labs-AI/g' "$banner_py" 2>/dev/null || \
+        sed -i 's/Nous Research/Yugo-Labs-AI/g' "$banner_py" 2>/dev/null
+    fi
+
+    ok "Engine banner rebranded"
+}
+
 # ─── Main ───────────────────────────────────────────────────
 main() {
     banner
@@ -242,6 +269,8 @@ main() {
     lock_deepseek
     echo ""
     install_skin
+    echo ""
+    rebrand_engine
     echo ""
 
     echo -e "${GREEN}${BOLD}   ⚡ Installation complete!${NC}"
