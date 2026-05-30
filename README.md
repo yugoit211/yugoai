@@ -1,9 +1,9 @@
 # YUGOAI Agent
 
-**White-label AI Agent — Hermes-powered, YUGOAI-branded.**
+**White-label AI Agent — Hermes-powered, YUGOAI-branded, DeepSeek-driven.**
 
-YUGOAI Agent adalah AI agent yang berjalan di terminal, messaging platforms, dan IDE.
-100% kompatibel dengan Hermes Agent — hanya beda nama dan identitas.
+YUGOAI Agent adalah AI agent yang berjalan di terminal.
+100% kompatibel dengan Hermes Agent — hanya beda nama, pakai DeepSeek.
 
 ---
 
@@ -13,10 +13,10 @@ YUGOAI Agent adalah AI agent yang berjalan di terminal, messaging platforms, dan
 curl -fsSL https://raw.githubusercontent.com/yugoit211/yugoai/main/install.sh | bash
 ```
 
-Tutup dan buka ulang terminal, lalu:
+Tutup dan buka ulang terminal, lalu set API key DeepSeek:
 
 ```bash
-yugoai setup       # Setup API key + model (sekali saja)
+export DEEPSEEK_API_KEY=sk-your-key-here
 yugoai              # Mulai chat!
 ```
 
@@ -25,7 +25,7 @@ yugoai              # Mulai chat!
 ## Fitur
 
 - Terminal-native AI agent dengan tool calling (shell, file, web, browser)
-- Support DeepSeek, OpenAI, Anthropic, OpenRouter, dan 15+ provider
+- Didukung penuh oleh DeepSeek
 - Persistent memory antar sesi
 - Self-improving skills
 - Messaging gateway (Telegram, Discord, Slack, WhatsApp, Signal, dll)
@@ -38,8 +38,6 @@ yugoai              # Mulai chat!
 ```bash
 yugoai                        # Interactive chat
 yugoai chat -q "query"        # Single query
-yugoai model                  # Ganti model/provider
-yugoai setup                  # Setup wizard
 yugoai doctor                 # Health check
 yugoai config                 # Lihat konfigurasi
 yugoai sessions list          # List sesi

@@ -144,6 +144,20 @@ create_profile() {
     ok "YUGOAI profile created"
 }
 
+# ─── Lock to DeepSeek ───────────────────────────────────────
+lock_deepseek() {
+    local profile_config="$HOME/.hermes/profiles/yugoai/config.yaml"
+
+    info "Locking YUGOAI to DeepSeek..."
+
+    hermes -p yugoai config set model.provider deepseek 2>/dev/null || true
+    hermes -p yugoai config set model.default deepseek-v4-pro 2>/dev/null || true
+    hermes -p yugoai config set model.base_url https://api.deepseek.com 2>/dev/null || true
+    hermes -p yugoai config set fallback_providers '[]' 2>/dev/null || true
+
+    ok "Locked to DeepSeek (deepseek-v4-pro)"
+}
+
 # ─── Main ───────────────────────────────────────────────────
 main() {
     banner
@@ -160,17 +174,18 @@ main() {
     echo ""
     create_profile
     echo ""
+    lock_deepseek
+    echo ""
 
     echo -e "${GREEN}${BOLD}   ⚡ Installation complete!${NC}"
+    echo ""
+    echo "   YUGOAI runs on DeepSeek. Set your API key:"
+    echo -e "     ${BOLD}export DEEPSEEK_API_KEY=sk-...${NC}"
+    echo "   Then add to ~/.zshrc or ~/.bashrc."
     echo ""
     echo "   Commands:"
     echo -e "     ${BOLD}yugoai${NC}                  Interactive chat"
     echo -e "     ${BOLD}yugoai chat -q '...'${NC}   Single query"
-    echo -e "     ${BOLD}yugoai setup${NC}           Setup API keys"
-    echo -e "     ${BOLD}yugoai model${NC}           Change model"
-    echo ""
-    echo "   Open a new terminal or run:"
-    echo -e "     ${BOLD}source ~/.zshrc${NC}   (or ~/.bashrc)"
     echo ""
 }
 
