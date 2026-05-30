@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# ============================================================
+#  YUGOAI Agent — White-label CLI wrapper for Hermes
+# ============================================================
+#
+#  Usage: yugoai [flags] [command]
+#
+#  All flags and commands are passed directly to hermes -p yugoai.
+#
+#  Examples:
+#    yugoai                              Interactive chat
+#    yugoai chat -q "What is Python?"    Single query
+#    yugoai model                        Change model
+#    yugoai setup                        Setup wizard
+#    yugoai config                       View config
+#    yugoai doctor                       Health check
+#
+# ============================================================
+
+set -euo pipefail
+
+HERMES_BIN="${HERMES_BIN:-hermes}"
+YUGOAI_PROFILE="${YUGOAI_PROFILE:-yugoai}"
+
+# Check if hermes is available
+if ! command -v "$HERMES_BIN" &>/dev/null; then
+    echo "Error: Hermes Agent not found. Install it first:"
+    echo "  curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash"
+    exit 1
+fi
+
+exec "$HERMES_BIN" -p "$YUGOAI_PROFILE" "$@"

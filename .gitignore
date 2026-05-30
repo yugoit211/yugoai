@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# YUGOAI user data (jangan commit!)
+config/user.yaml
+.env

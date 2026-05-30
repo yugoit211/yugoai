@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# ============================================================
+#  YUGOAI Agent — Standalone Installer (curl-pipe friendly)
+# ============================================================
+#  Usage:
+#    curl -fsSL https://raw.githubusercontent.com/USER/yugoai-agent/main/install.sh | bash
+#
+#  Or locally:
+#    ./install.sh
+# ============================================================
+set -euo pipefail
+
+BOLD="\033[1m"
+GREEN="\033[0;32m"
+YELLOW="\033[0;33m"
+RED="\033[0;31m"
+CYAN="\033[0;36m"
+NC="\033[0m"
+
+YUGOAI_HOME="${YUGOAI_HOME:-${HOME}/YUGOAI}"
+LOCAL_BIN="${HOME}/.local/bin"
+HERMES_INSTALL_URL="https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh"
+
+banner() {
+    echo ""
+    echo -e "${CYAN}${BOLD}   ⚡ YUGOAI Agent Installer${NC}"
+    echo -e "${CYAN}   ============================${NC}"
+    echo ""
+}
+
+info()  { echo -e "   ${CYAN}→${NC} $*"; }
+ok()    { echo -e "   ${GREEN}✓${NC} $*"; }
+warn()  { echo -e "   ${YELLOW}!${NC} $*"; }
+fail()  { echo -e "   ${RED}✗${NC} $*"; }
+
+# ─── Determine OS ───────────────────────────────────────────
+detect_os() {
+    case "$(uname -s)" in
+        Darwin)  OS="macos" ;;
+        Linux)   OS="linux" ;;
+        *)
+            fail "Unsupported OS: $(uname -s)"
+            exit 1
+            ;;
+    esac
+}
+
+# ─── Install Hermes if missing ──────────────────────────────
+ensure_hermes() {
+    if command -v hermes &>/dev/null; then
+        ok "Hermes Agent already installed: $(hermes --version 2>/dev/null | head -1)"
+        return 0
+    fi
+
+    info "Hermes Agent not found. Installing..."
+    
+    if command -v curl &>/dev/null; then
+        curl -fsSL "$HERMES_INSTALL_URL" | bash
+    elif command -v wget &>/dev/null; then
+        wget -qO- "$HERMES_INSTALL_URL" | bash
+    else
+        fail "Neither curl nor wget found. Install one and retry."
+        exit 1
+    fi
+
+    # Verify
+    if ! command -v hermes &>/dev/null; then
+        # Hermes installer puts it in ~/.local/bin
+        export PATH="${HOME}/.local/bin:${PATH}"
+        if ! command -v hermes &>/dev/null; then
+            fail "Hermes installation failed. Install manually:"
+            echo "     curl -fsSL $HERMES_INSTALL_URL | bash"
+            exit 1
+        fi
+    fi
+
+    ok "Hermes Agent installed: $(hermes --version 2>/dev/null | head -1)"
+}
+
+# ─── Setup PATH ─────────────────────────────────────────────
+ensure_path() {
+    mkdir -p "$LOCAL_BIN"
+
+    if [[ ":$PATH:" == *":$LOCAL_BIN:"* ]]; then
+        return 0
+    fi
+
+    warn "$LOCAL_BIN is not in your PATH."
+
+    # Detect shell config
+    local shell_rc=""
+    case "$SHELL" in
+        */zsh)  shell_rc="$HOME/.zshrc" ;;
+        */bash) shell_rc="$HOME/.bashrc" ;;
+        *)      shell_rc="$HOME/.profile" ;;
+    esac
+
+    if [ -f "$shell_rc" ]; then
+        if ! grep -q "$LOCAL_BIN" "$shell_rc" 2>/dev/null; then
+            echo "" >> "$shell_rc"
+            echo "# Added by YUGOAI Agent installer" >> "$shell_rc"
+            echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$shell_rc"
+            ok "Added $LOCAL_BIN to $shell_rc"
+        fi
+    fi
+
+    export PATH="$LOCAL_BIN:$PATH"
+}
+
+# ─── Install YUGOAI wrapper ─────────────────────────────────
+install_wrapper() {
+    info "Installing yugoai CLI wrapper..."
+
+    cat > "$LOCAL_BIN/yugoai" << 'WRAPPER_EOF'
+#!/usr/bin/env bash
+# YUGOAI Agent — white-label CLI wrapper for Hermes
+set -euo pipefail
+
+HERMES_BIN="${HERMES_BIN:-hermes}"
+YUGOAI_PROFILE="${YUGOAI_PROFILE:-yugoai}"
+
+if ! command -v "$HERMES_BIN" &>/dev/null; then
+    echo "Error: Hermes Agent not found."
+    echo "Install: curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash"
+    exit 1
+fi
+
+exec "$HERMES_BIN" -p "$YUGOAI_PROFILE" "$@"
+WRAPPER_EOF
+
+    chmod +x "$LOCAL_BIN/yugoai"
+    ok "Wrapper installed: $LOCAL_BIN/yugoai"
+}
+
+# ─── Create YUGOAI profile ──────────────────────────────────
+create_profile() {
+    if hermes profile list 2>/dev/null | grep -q "^◆yugoai "; then
+        info "YUGOAI profile already exists"
+        return 0
+    fi
+
+    info "Creating YUGOAI profile (cloning from default)..."
+    hermes profile create yugoai --clone 2>&1 | tail -1
+    ok "YUGOAI profile created"
+}
+
+# ─── Main ───────────────────────────────────────────────────
+main() {
+    banner
+    detect_os
+
+    info "OS detected: $OS"
+    echo ""
+
+    ensure_path
+    echo ""
+    ensure_hermes
+    echo ""
+    install_wrapper
+    echo ""
+    create_profile
+    echo ""
+
+    echo -e "${GREEN}${BOLD}   ⚡ Installation complete!${NC}"
+    echo ""
+    echo "   Commands:"
+    echo -e "     ${BOLD}yugoai${NC}                  Interactive chat"
+    echo -e "     ${BOLD}yugoai chat -q '...'${NC}   Single query"
+    echo -e "     ${BOLD}yugoai setup${NC}           Setup API keys"
+    echo -e "     ${BOLD}yugoai model${NC}           Change model"
+    echo ""
+    echo "   Open a new terminal or run:"
+    echo -e "     ${BOLD}source ~/.zshrc${NC}   (or ~/.bashrc)"
+    echo ""
+}
+
+main "$@"
