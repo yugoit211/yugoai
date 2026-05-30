@@ -13,10 +13,9 @@ YUGOAI Agent adalah AI agent yang berjalan di terminal.
 curl -fsSL https://raw.githubusercontent.com/yugoit211/yugoai/main/install.sh | bash
 ```
 
-Tutup dan buka ulang terminal, lalu set API key DeepSeek:
+Buka terminal baru, langsung pakai:
 
 ```bash
-export DEEPSEEK_API_KEY=sk-your-key-here
 yugoai              # Mulai chat!
 ```
 
