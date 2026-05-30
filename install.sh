@@ -166,6 +166,63 @@ lock_deepseek() {
     ok "Locked to DeepSeek (deepseek-v4-pro)"
 }
 
+# ─── Install YUGOAI skin ────────────────────────────────────
+install_skin() {
+    local skin_dir="$HOME/.hermes/profiles/yugoai/skins"
+    local skin_src="$YUGOAI_HOME/skins/yugoai.yaml"
+
+    mkdir -p "$skin_dir"
+
+    if [ -f "$skin_src" ]; then
+        cp "$skin_src" "$skin_dir/yugoai.yaml"
+        hermes -p yugoai config set display.skin yugoai 2>/dev/null || true
+        ok "YUGOAI skin installed"
+    else
+        # Self-contained: write skin from heredoc
+        cat > "$skin_dir/yugoai.yaml" << 'SKINEOF'
+# YUGOAI Agent Skin
+name: yugoai
+description: "YUGOAI — DeepSeek-powered AI agent"
+
+colors:
+  banner_border: "#00BFFF"
+  banner_title: "#00BFFF"
+  banner_accent: "#1E90FF"
+  banner_dim: "#00688B"
+  banner_text: "#E0F0FF"
+  ui_accent: "#1E90FF"
+  ui_label: "#00BFFF"
+  ui_ok: "#4caf50"
+  ui_error: "#ef5350"
+  ui_warn: "#ffa726"
+  prompt: "#E0F0FF"
+  input_rule: "#00BFFF"
+  response_border: "#1E90FF"
+  status_bar_bg: "#0A1628"
+  session_label: "#00BFFF"
+  session_border: "#5A7A8C"
+
+branding:
+  agent_name: "YUGOAI Agent"
+  welcome: "Welcome to YUGOAI Agent! Type your message or /help for commands."
+  goodbye: "Goodbye! YUGOAI out."
+  response_label: " YUGOAI "
+  prompt_symbol: "❯"
+  help_header: "Available Commands"
+
+banner_logo: |
+  [bold #00BFFF]██╗   ██╗██╗   ██╗ ██████╗  ██████╗  █████╗ ██╗[/]
+  [bold #00BFFF]╚██╗ ██╔╝██║   ██║██╔════╝ ██╔═══██╗██╔══██╗██║[/]
+  [#1E90FF] ╚████╔╝ ██║   ██║██║  ███╗██║   ██║███████║██║[/]
+  [#1E90FF]  ╚██╔╝  ██║   ██║██║   ██║██║   ██║██╔══██║██║[/]
+  [#00688B]   ██║   ╚██████╔╝╚██████╔╝╚██████╔╝██║  ██║██║[/]
+  [#00688B]   ╚═╝    ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝[/]
+SKINEOF
+        hermes -p yugoai config set display.skin yugoai 2>/dev/null || true
+        ok "YUGOAI skin installed (built-in)"
+    fi
+}
+
 # ─── Main ───────────────────────────────────────────────────
 main() {
     banner
@@ -183,6 +240,8 @@ main() {
     create_profile
     echo ""
     lock_deepseek
+    echo ""
+    install_skin
     echo ""
 
     echo -e "${GREEN}${BOLD}   ⚡ Installation complete!${NC}"

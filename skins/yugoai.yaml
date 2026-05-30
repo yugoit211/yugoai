@@ -1,0 +1,47 @@
+# YUGOAI Agent Skin
+name: yugoai
+description: "YUGOAI — DeepSeek-powered AI agent"
+
+colors:
+  banner_border: "#00BFFF"
+  banner_title: "#00BFFF"
+  banner_accent: "#1E90FF"
+  banner_dim: "#00688B"
+  banner_text: "#E0F0FF"
+  ui_accent: "#1E90FF"
+  ui_label: "#00BFFF"
+  ui_ok: "#4caf50"
+  ui_error: "#ef5350"
+  ui_warn: "#ffa726"
+  prompt: "#E0F0FF"
+  input_rule: "#00BFFF"
+  response_border: "#1E90FF"
+  status_bar_bg: "#0A1628"
+  session_label: "#00BFFF"
+  session_border: "#5A7A8C"
+
+spinner:
+  thinking_verbs:
+    - "processing"
+    - "analyzing"
+    - "computing"
+    - "reasoning"
+    - "generating"
+
+branding:
+  agent_name: "YUGOAI Agent"
+  welcome: "Welcome to YUGOAI Agent! Type your message or /help for commands."
+  goodbye: "Goodbye! YUGOAI out."
+  response_label: " YUGOAI "
+  prompt_symbol: "❯"
+  help_header: "Available Commands"
+
+banner_logo: |
+  [bold #00BFFF]██╗   ██╗██╗   ██╗ ██████╗  ██████╗  █████╗ ██╗[/]
+  [bold #00BFFF]╚██╗ ██╔╝██║   ██║██╔════╝ ██╔═══██╗██╔══██╗██║[/]
+  [#1E90FF] ╚████╔╝ ██║   ██║██║  ███╗██║   ██║███████║██║[/]
+  [#1E90FF]  ╚██╔╝  ██║   ██║██║   ██║██║   ██║██╔══██║██║[/]
+  [#00688B]   ██║   ╚██████╔╝╚██████╔╝╚██████╔╝██║  ██║██║[/]
+  [#00688B]   ╚═╝    ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝[/]
+
+banner_hero: ""
